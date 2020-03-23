@@ -1,0 +1,471 @@
+@import "keyframes";
+
+@light-color: #fff;
+@dark-color: #000;
+
+@border-fill: @dark-color;
+@border-transparent: transparent;
+
+@bang-color: #6b0a00;
+@cell-color: #4e3e73;
+@cell-color-hover: #a4a4d5;
+@marking-light-blue: #d4c8f1;
+@aim-color: greenyellow;
+
+@aim-hit-color: red;
+
+@aim-killed-color: #b51a1a;
+@empty-color: #645096;
+@hit-color: gray;
+@hit-shadow-color: #4a4949;
+@killed-color: #843535;
+
+@button-color: @cell-color;
+@button-color-dark: #030304;
+@button-border: @empty-color;
+
+@cell-width: 35px;
+@cell-height: @cell-width;
+
+body {
+    background-color: #000;
+}
+
+.clearfix {
+
+    &:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+}
+
+* {
+    font-family: Arial, sans-serif;
+}
+
+.sb {
+    width: @cell-width * 24;
+    height: @cell-width * 18;
+    margin: auto;
+    //position: absolute;
+    //top: 50%;
+    //left: 50%;
+    //transform: translate(-50%, -50%);
+    background: url("../img/images/sb.jpg") center no-repeat;
+    background-size: cover;
+}
+
+.header {
+    margin-bottom: 5px;
+    padding-top: 25px;
+}
+
+.title {
+    text-align: center;
+    font-size: 30px;
+    text-shadow: -1px 1px 1px @marking-light-blue;
+    color: @cell-color;
+}
+
+.container {
+    position: relative;
+    text-align: center;
+}
+
+.game {
+    margin-bottom: 50px;
+
+    &__info {
+        display: none;
+        position: absolute;
+        color: lime;
+        font-size: 29px;
+        left: @cell-width * 3.5;
+        top: 50%;
+        z-index: 1000;
+        transition: all 0.4s;
+        animation: flash-info 2.5s;
+
+        &.show {
+            display: inline-block;
+        }
+    }
+}
+
+.field {
+    display: inline-block;
+    float: left;
+    margin-left: 5px;
+    border: 1px solid @border-transparent;
+    border-collapse: collapse;
+
+    .main-cell() {
+        background: @cell-color;
+        cursor: pointer;
+    }
+
+    .cell {
+        position: relative;
+        width: @cell-width;
+        height: @cell-height;
+        border: 1px solid @border-fill;
+        border-collapse: collapse;
+        transition: all 0.5s;
+        .main-cell();
+
+        &:before,
+        &:after {
+            position: absolute;
+            content: '';
+        }
+
+        // горизонтальная линия креста
+        &:before {
+            left: @cell-width/2;
+            top: @cell-height/2;
+            width: 0;
+            height: 1px;
+        }
+
+        // вертикальная линия креста
+        &:after {
+            left: @cell-width/2;
+            top: @cell-height/2;
+            height: 0;
+            width: 1px;
+        }
+
+        &:hover {
+            box-shadow: inset 0 0 @cell-width/1.5 0 @cell-color-hover;
+            z-index: 100;
+
+            // горизонтальная линия креста
+            &:before {
+                left: @cell-width/4;
+                top: @cell-height/2;
+                width: (@cell-width/2 + 1px);
+                height: 1px;
+                background: @aim-color;
+                transition: all 0.3s;
+            }
+
+            // вертикальная линия креста
+            &:after {
+                left: @cell-width/2;
+                top: @cell-height/4;
+                height: (@cell-width/2 + 1px);
+                width: 1px;
+                background: @aim-color;
+                transition: all 0.3s;
+            }
+        }
+
+        &.boom {
+            animation: cell-boom 1.2s;
+            z-index: 100;
+
+            &:before {
+                animation: boom-horiz 0.6s;
+            }
+
+            &:after {
+                animation: boom-vert 0.6s;
+            }
+        }
+
+        &.empty {
+            cursor: default;
+            background: @empty-color;
+            box-shadow: inset 0 0 @cell-width/2.8 0 @cell-color-hover;
+
+            &:hover,
+            &:focus,
+            &:active {
+                box-shadow: inset 0 0 @cell-width/2.8 0 @cell-color-hover;
+            }
+
+            &:before {
+                animation: hide-x-horiz 0.6s;
+            }
+            &:after {
+                animation: hide-x-vert 0.6s;
+            }
+        }
+
+        &.boat {
+            position: relative;
+            background: @hit-color;
+            box-shadow: inset 0 0 8px 2px @hit-shadow-color;
+
+            &.hide {
+                .main-cell();
+                box-shadow: none;
+            }
+        }
+
+        &.hit {
+            background: @hit-color !important;
+            box-shadow: inset 0 0 8px 2px @hit-shadow-color !important;
+            &:before,
+            &:after {
+                position: absolute;
+                content: '';
+                background: @aim-hit-color;
+            }
+
+            // горизонтальная линия креста
+            &:before {
+                left: (@cell-width/3 - 1px);
+                top: @cell-height/2;
+                height: 4px;
+                width: @cell-width/2;
+                transform: rotate(-135deg);
+            }
+
+            // вертикальная линия креста
+            &:after {
+                left: @cell-width/2;
+                top: (@cell-height/3 - 1px);
+                height: @cell-width/2;
+                width: 4px;
+                transform: rotate(45deg);
+            }
+
+            &.hide {
+                .main-cell();
+            }
+        }
+
+        &.killed {
+            background: @killed-color !important;
+            display: table-cell !important;
+            &:before,
+            &:after {
+                background: @aim-killed-color;
+            }
+        }
+
+        &.inactive {
+            cursor: default;
+            opacity: 0.7;
+
+            &:hover,
+            &:focus,
+            &:active {
+                box-shadow: none !important;
+                cursor: default;
+                opacity: 0.7;
+            }
+        }
+    }
+
+    .marking {
+        position: relative;
+        width: @cell-width;
+        height: @cell-height;
+        border-collapse: collapse;
+        text-align: center;
+        align-items: center;
+        text-transform: uppercase;
+        font-weight: bold;
+        cursor: default;
+        background: @border-transparent;
+        border: 1px solid @border-transparent;
+        text-shadow: -1px 1px 1px @marking-light-blue;
+        color: @cell-color;
+        font-size: 18px;
+        box-shadow: none;
+
+        &.no-use {
+            border: 1px solid @border-transparent;
+        }
+
+        &_letter {
+            border-bottom: 1px solid @border-fill;
+        }
+
+        &_number {
+            border-right: 1px solid @border-fill;
+        }
+
+        &:hover {
+            position: relative;
+            box-shadow: none;
+
+            &:before,
+            &:after {
+                display: none;
+            }
+
+            &:after {
+                display: none;
+            }
+        }
+    }
+}
+
+.history {
+    float: left;
+    margin-top: 38px;
+    min-width: 275px;
+    width: 275px;
+    text-align: right;
+    color: #c8c0dc;
+    margin-left: 50px;
+    padding: 15px 30px 10px;
+    height: 355px;
+    background: #00000075;
+    border-radius: 6px;
+    border: 1px solid darkblue;
+
+    &__title {
+        margin-bottom: 5px;
+    }
+
+    &__steps {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+
+    &__list {
+        list-style: none;
+        padding-right: 5px;
+        margin-left: 0;
+        padding-left: 0;
+    }
+
+    &__list-wrap {
+        max-height: 295px;
+        overflow: auto;
+    }
+
+    &__item {
+        margin-bottom: 10px;
+
+        .value {
+            display: inline-block;
+            width: 100px;
+            font-weight: 600;
+
+            &_time {
+                font-weight: 400;
+                font-style: italic;
+            }
+        }
+    }
+}
+
+.footer {
+    padding-bottom: 15px;
+    text-align: center;
+}
+
+.sb-btn {
+    position: relative;
+    display: inline-block;
+    overflow: hidden;
+    -webkit-transition: all .2s ease-in-out;
+    transition-timing-function: ease;
+    transition-duration: .6s;
+    transition-property: all;
+
+    text-decoration: none;
+    text-transform: uppercase;
+    color: #ccccff;
+    background: @button-color;
+    background-image: linear-gradient(to bottom, @button-color 0%, @button-border 100%);
+    padding: 15px 55px;
+    border: 1px solid @button-border;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 20px;
+    transition: all 1.5s;
+
+    &:hover,
+    &:active {
+        background: #030304;
+        background: @button-color-dark;
+        //background-image: linear-gradient(to bottom, @button-color-dark 0%, @button-color 100%);
+        text-decoration: none;
+        box-shadow: 0 0 35px 5px #000000;
+        color: @light-color;
+    }
+
+    &:active {
+        background: @killed-color;
+        text-decoration: none;
+        box-shadow: 0 0 22px 3px @aim-hit-color;
+        color: @light-color;
+        transition: all 0.2s;
+    }
+
+    &__wrapper {
+        margin-bottom: 30px;
+    }
+
+    &:hover:after {
+        left: 120%;
+        transition: all 450ms cubic-bezier(.19, 1, .22, 1);
+    }
+
+    &:after {
+        position: absolute;
+        z-index: 10;
+        top: -50px;
+        left: -75px;
+        width: 50px;
+        height: 155px;
+        content: '';
+        transition: all 650ms 100ms cubic-bezier(.19, 1, .22, 1);
+        transform: rotate(35deg);
+        opacity: .3;
+        background: @aim-color;
+    }
+}
+
+.sb-modal {
+    display: none;
+    position: fixed;
+    width: 500px;
+    height: 400px;
+    padding-top: 170px;
+    background: @cell-color;
+    color: @light-color;
+    font-weight: 600;
+    text-transform: uppercase;
+    top: 50%;
+    left: 50%;
+    box-shadow: 0 0 120px 8px #524444;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+
+    text-align: center;
+    box-sizing: border-box;
+    font-size: 50px;
+    line-height: 1;
+
+    .x {
+        position: absolute;
+        cursor: pointer;
+        top: 10px;
+        right: 10px;
+        font-size: 42px;
+    }
+
+    &.show {
+        display: block;
+    }
+}
+
+.demo-show {
+    position: absolute;
+    width: 40px;
+    top: 0;
+    left: 5px;
+    z-index: 100;
+
+    &__icon {
+        width: 100%;
+    }
+}
